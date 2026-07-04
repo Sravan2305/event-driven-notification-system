@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm --target node22 --clean",
+    "build": "prisma generate && tsup src/index.ts --format esm --target node22 --clean",
     "start": "node dist/index.js",
     "test": "vitest",
     "lint": "eslint .",
