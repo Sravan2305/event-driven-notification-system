@@ -30,6 +30,8 @@ model Event {
   @@index([status])
   @@index([createdAt])
   @@map("events")
+
+  outboxEvents OutboxEvent[]
 }
 
 model Subscription {
@@ -37,16 +39,40 @@ model Subscription {
 
   webhookUrl     String
 
-  eventTypes     Json
+  eventTypes     String[]
 
-  sources        Json
+  sources        String[]
 
   payloadFilters Json?
 
-  enabled        Boolean @default(true)
+  enabled        Boolean  @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
+  @@index([enabled])
   @@map("subscriptions")
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+model OutboxEvent {
+  id          String        @id @db.VarChar(30)
+
+  eventId     String
+
+  event       Event         @relation(fields: [eventId], references: [id])
+
+  status      OutboxStatus  @default(PENDING)
+
+  createdAt   DateTime      @default(now())
+
+  publishedAt DateTime?
+
+  @@index([status])
+  @@map("outbox_events")
 }
