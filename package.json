@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "prisma generate && tsup src/index.ts --format esm --target node22 --clean",
-    "start": "node dist/index.js",
+"start": "node dist/index.mjs",
     "test": "vitest",
     "lint": "eslint .",
     "format": "prettier --write ."
