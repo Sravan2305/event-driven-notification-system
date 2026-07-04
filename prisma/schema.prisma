@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventStatus {
+  ACCEPTED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Event {
+  id          String      @id @db.VarChar(30)
+  eventType   String      @db.VarChar(100)
+  source      String      @db.VarChar(100)
+  payload     Json
+
+  status      EventStatus @default(ACCEPTED)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([eventType])
+  @@index([source])
+  @@index([status])
+  @@index([createdAt])
+  @@map("events")
+}
+
+model Subscription {
+  id             String   @id @db.VarChar(30)
+
+  webhookUrl     String
+
+  eventTypes     Json
+
+  sources        Json
+
+  payloadFilters Json?
+
+  enabled        Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriptions")
+}

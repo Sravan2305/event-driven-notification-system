@@ -1,4 +1,9 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import {
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
+
+import { prisma } from "../../infrastructure/database/prisma";
 
 export async function getHealth(
   request: FastifyRequest,
@@ -23,7 +28,15 @@ export async function getReadiness(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  return reply.send({
-    status: "ready",
-  });
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+
+    return reply.send({
+      status: "ready",
+    });
+  } catch {
+    return reply.status(503).send({
+      status: "not_ready",
+    });
+  }
 }
