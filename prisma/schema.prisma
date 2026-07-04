@@ -13,6 +13,11 @@ enum EventStatus {
   COMPLETED
   FAILED
 }
+enum DeliveryStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
 
 model Event {
   id          String      @id @db.VarChar(30)
@@ -32,6 +37,7 @@ model Event {
   @@map("events")
 
   outboxEvents OutboxEvent[]
+  deliveries Delivery[]
 }
 
 model Subscription {
@@ -52,6 +58,7 @@ model Subscription {
 
   @@index([enabled])
   @@map("subscriptions")
+  deliveries Delivery[]
 }
 
 enum OutboxStatus {
@@ -75,4 +82,29 @@ model OutboxEvent {
 
   @@index([status])
   @@map("outbox_events")
+}
+
+model Delivery {
+  id             String         @id @db.VarChar(30)
+
+  eventId        String
+  subscriptionId String
+
+  event          Event          @relation(fields: [eventId], references: [id])
+  subscription   Subscription   @relation(fields: [subscriptionId], references: [id])
+
+  status         DeliveryStatus @default(PENDING)
+
+  responseCode   Int?
+
+  responseBody   String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([subscriptionId])
+  @@index([status])
+
+  @@map("deliveries")
 }

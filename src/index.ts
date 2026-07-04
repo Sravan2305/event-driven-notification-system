@@ -4,6 +4,7 @@ import { buildApp } from "./app";
 import { registerGracefulShutdown } from "./bootstrap/shutdown";
 import { logger } from "./common/logger/logger";
 import { env } from "./config";
+import { FanoutWorker } from "./workers/fanout.worker";
 
 async function start() {
   try {
@@ -15,6 +16,9 @@ async function start() {
       port: env.PORT,
       host: "0.0.0.0",
     });
+    const fanoutWorker = new FanoutWorker();
+
+    void fanoutWorker.start();
 
     logger.info(
       {
